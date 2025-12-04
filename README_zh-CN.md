@@ -25,7 +25,7 @@
 ## 🛎️更新日志
 * **` 通知🐍🐍`**: ChangeMamba已经被 [IEEE TGRS](https://ieeexplore.ieee.org/document/10565926) 接收！仓库的代码已更新完毕！如果对您的研究有所帮助，请考虑给该仓库一个⭐️**star**⭐️！
 * **` 2025年05月21日`**: 更新了ChangeMamba在[BRIGHT数据集](https://github.com/ChenHongruixuan/BRIGHT)上的训练代码和[模型权重](https://zenodo.org/records/14037769)！！
-* **` 2025年05月08日`**: ChangeMamba连续八个月入选🔥ESI热点和高被引论文🏆！！
+* **` 2025年12月13日`**: ChangeMamba连续12个月入选🔥ESI热点和高被引论文🏆！！
 * **` 2024年11月14日`**: ChangeMamba入选为🔥ESI 热点论文🔥！！
 * **` 2024年09月14日`**: ChangeMamba入选为🏆ESI 高被引论文🏆！！
 * **` 2024年07月19日`**: ChangeMamba入选为[ IEEE TGRS 热点论文](https://ieeexplore.ieee.org/xpl/topAccessedArticles.jsp?punumber=36)！！
