@@ -11,7 +11,7 @@ set -euo pipefail
 
 PYTHON_BIN="${PYTHON_BIN:-/home/chenhrx/anaconda3/envs/anydisaster/bin/python}"
 PROJECT_ROOT='/home/chenhrx/project/ChangeMamba'
-DATA_ROOT='/home/chenhrx/datasets/SYSU-CD'
+DATA_ROOT='/home/chenhrx/dataset/SYSU-CD'
 LIST_ROOT="$PROJECT_ROOT/changedetection/datasets/data_name_list/SYSU-CD"
 CFG_PATH="$PROJECT_ROOT/changedetection/configs/vssm1/vssm_tiny_224_0229flex.yaml"
 
