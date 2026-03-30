@@ -228,16 +228,24 @@ def _update_config_from_file(config, cfg_file):
 
 
 def update_config(config, args):
-    _update_config_from_file(config, args.cfg)
+    if getattr(args, "cfg", None):
+        _update_config_from_file(config, args.cfg)
 
     config.defrost()
     if args.opts:
         config.merge_from_list(args.opts)
 
     def _check_args(name):
-        if hasattr(args, name) and eval(f'args.{name}'):
-            return True
-        return False
+        if not hasattr(args, name):
+            return False
+        value = getattr(args, name)
+        if value is None:
+            return False
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            return value != ''
+        return True
 
     # merge from specific arguments
     if _check_args('batch_size'):

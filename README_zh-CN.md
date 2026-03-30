@@ -24,6 +24,7 @@
 
 ## 🛎️更新日志
 * **` 通知🐍🐍`**: ChangeMamba已经被 [IEEE TGRS](https://ieeexplore.ieee.org/document/10565926) 接收！仓库的代码已更新完毕！如果对您的研究有所帮助，请考虑给该仓库一个⭐️**star**⭐️！
+* **` 2026年03月30日`**: 我们清理了无关的代码，让repo更加简洁。并且ChangeMamba继续入选🔥ESI热点和高被引论文🏆！！
 * **` 2025年05月21日`**: 更新了ChangeMamba在[BRIGHT数据集](https://github.com/ChenHongruixuan/BRIGHT)上的训练代码和[模型权重](https://zenodo.org/records/14037769)！！
 * **` 2025年12月13日`**: ChangeMamba连续12个月入选🔥ESI热点和高被引论文🏆！！
 * **` 2024年11月14日`**: ChangeMamba入选为🔥ESI 热点论文🔥！！
@@ -216,7 +217,7 @@ cd <project_path>/MambaCD/changedetection
 python script/train_MambaBCD.py  --dataset 'SYSU' \
                                  --batch_size 16 \
                                  --crop_size 256 \
-                                 --max_iters 320000 \
+                                 --max_iters 50000 \
                                  --model_type MambaBCD_Small \
                                  --model_param_path '<project_path>/MambaCD/changedetection/saved_models' \ 
                                  --train_dataset_path '<dataset_path>/SYSU/train' \
@@ -233,8 +234,8 @@ python script/train_MambaBCD.py  --dataset 'SYSU' \
 ```bash
 python script/train_MambaSCD.py  --dataset 'SECOND' \
                                  --batch_size 16 \
-                                 --crop_size 256 \
-                                 --max_iters 800000 \
+                                 --crop_size 512 \
+                                 --max_iters 50000 \
                                  --model_type MambaSCD_Small \
                                  --model_param_path '<project_path>/MambaCD/changedetection/saved_models' \ 
                                  --train_dataset_path '<dataset_path>/SECOND/train' \
@@ -251,8 +252,8 @@ python script/train_MambaSCD.py  --dataset 'SECOND' \
 ```bash
 python script/train_MambaBDA.py  --dataset 'xBD' \
                                  --batch_size 16 \
-                                 --crop_size 256 \
-                                 --max_iters 800000 \
+                                 --crop_size 512 \
+                                 --max_iters 80000 \
                                  --model_type MambaBDA_Small \
                                  --model_param_path '<project_path>/MambaCD/changedetection/saved_models' \ 
                                  --train_dataset_path '<dataset_path>/xBD/train' \
@@ -311,7 +312,7 @@ python script/infer_MambaBDA.py  --dataset 'SECOND'  \
 
 ## ⚗️结果下载
 
-* *我们上传到Github的代码是经过重新组织整理的。下面提供的模型权重也是采用重新组织整理后的代码训练得到的。因此精度可能会和原始论文不完全一致（大多数情况都高于论文中报告的精度）。*
+* *我们上传到Github的代码是经过重构整理的。下面提供的模型权重也是采用重构后的代码训练得到的。因此精度可能会和原始论文不完全一致（大多数情况都高于论文中报告的精度）。*
 
 * *我们还上传了 ChangeMamba的预测结果。您可以下载并直接在论文中使用它们 [[Zenodo](https://zenodo.org/records/14037769)][[GDrive](https://drive.google.com/drive/folders/1kVKgbElM23c-hSNZ_TTqfxXNXrPgNJ6L?usp=sharing)][[BaiduYun](https://pan.baidu.com/s/1RYXRL0emsKDL_9_v82nIjQ?pwd=df2t)].*
 

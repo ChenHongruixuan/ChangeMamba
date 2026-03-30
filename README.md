@@ -20,6 +20,7 @@
 
 ## 🛎️Updates
 * **` Notice🐍🐍`**: ChangeMamba has been accepted by [IEEE TGRS](https://ieeexplore.ieee.org/document/10565926)! We'd appreciate it if you could give this repo a ⭐️**star**⭐️ and stay tuned!!
+* **` Mar. 30th, 2026`**: We have removed unnecessary code to streamline the repo. Additionally, ChangeMamba has once again been selected as 🔥ESI Hot Paper and Highly Cited Paper🏆!!
 * **` May. 21th, 2025`**: We have updated the script to train ChangeMamba on [BRIGHT dataset](https://github.com/ChenHongruixuan/BRIGHT) and released [model's checkpoints](https://zenodo.org/records/14037769)!!
 * **` Nov. 13th, 2025`**: ChangeMamba has been selected as 🔥ESI Hot Paper and Highly Cited Paper🏆 for 12 consecutive months!!
 * **` Nov. 14th, 2024`**: ChangeMamba has been selected as 🔥ESI Hot Paper🔥!!
@@ -57,8 +58,8 @@ The repo is based on the [VMama repo](https://github.com/MzeroMiko/VMamba), thus
 
 Clone this repository and navigate to the project directory:
 ```bash
-git clone https://github.com/ChenHongruixuan/MambaCD.git
-cd MambaCD
+git clone https://github.com/ChenHongruixuan/ChangeMamba.git
+cd ChangeMamba
 ```
 
 
@@ -90,7 +91,7 @@ pip install mmdet==3.3.0 mmsegmentation==1.2.2 mmpretrain==1.2.0
 ### `B. Download Pretrained Weight`
 Also, please download the pretrained weights of [VMamba-Tiny](https://zenodo.org/records/14037769), [VMamba-Small](https://zenodo.org/records/14037769), and [VMamba-Base](https://zenodo.org/records/14037769) and put them under 
 ```bash
-project_path/MambaCD/pretrained_weight/
+project_path/ChangeMamba/pretrained_weight/
 ```
 
 ### `C. Data Preparation`
@@ -195,7 +196,7 @@ ${DATASET_ROOT}   # Dataset root directory, for example: /home/username/data/xBD
 Before training models, please enter into [`changedetection`] folder, which contains all the code for network definitions, training and testing. 
 
 ```bash
-cd <project_path>/MambaCD/changedetection
+cd <project_path>/ChangeMamba/changedetection
 ```
 
 ***Binary change detection***
@@ -205,7 +206,7 @@ The following commands show how to train and evaluate MambaBCD-Small on the SYSU
 python script/train_MambaBCD.py  --dataset 'SYSU' \
                                  --batch_size 16 \
                                  --crop_size 256 \
-                                 --max_iters 320000 \
+                                 --max_iters 20000 \
                                  --model_type MambaBCD_Small \
                                  --model_param_path '<project_path>/MambaCD/changedetection/saved_models' \ 
                                  --train_dataset_path '<dataset_path>/SYSU/train' \
@@ -222,8 +223,8 @@ The following commands show how to train and evaluate MambaSCD-Small on the SECO
 ```bash
 python script/train_MambaSCD.py  --dataset 'SECOND' \
                                  --batch_size 16 \
-                                 --crop_size 256 \
-                                 --max_iters 800000 \
+                                 --crop_size 512 \
+                                 --max_iters 50000 \
                                  --model_type MambaSCD_Small \
                                  --model_param_path '<project_path>/MambaCD/changedetection/saved_models' \ 
                                  --train_dataset_path '<dataset_path>/SECOND/train' \
@@ -240,8 +241,8 @@ The following commands show how to train and evaluate MambaBDA-Small on the xBD 
 ```bash
 python script/train_MambaBDA.py  --dataset 'xBD' \
                                  --batch_size 16 \
-                                 --crop_size 256 \
-                                 --max_iters 800000 \
+                                 --crop_size 512 \
+                                 --max_iters 80000 \
                                  --model_type MambaBDA_Small \
                                  --model_param_path '<project_path>/MambaCD/changedetection/saved_models' \ 
                                  --train_dataset_path '<dataset_path>/xBD/train' \
