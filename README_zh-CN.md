@@ -10,9 +10,9 @@
 
 <sup>#</sup> 共同第一作者, <sup>*</sup> 通讯作者
 
-[![TGRS paper](https://img.shields.io/badge/TGRS-paper-00629B.svg)](https://ieeexplore.ieee.org/document/10565926)  [![arXiv paper](https://img.shields.io/badge/arXiv-paper-b31b1b.svg)](https://arxiv.org/pdf/2404.03425.pdf) [![Zenodo Models](https://img.shields.io/badge/Zenodo-Models-green)](https://zenodo.org/records/14037769) ![visitors](https://visitor-badge.laobi.icu/badge?page_id=ChenHongruixuan.MambaCD&left_color=%2363C7E6&right_color=%23CEE75F)
+[![TGRS paper](https://img.shields.io/badge/TGRS-paper-00629B.svg)](https://ieeexplore.ieee.org/document/10565926)  [![arXiv paper](https://img.shields.io/badge/arXiv-paper-b31b1b.svg)](https://arxiv.org/pdf/2404.03425.pdf) [![Zenodo Models](https://img.shields.io/badge/Zenodo-Models-green)](https://zenodo.org/records/14037769) ![visitors](https://visitor-badge.laobi.icu/badge?page_id=ChenHongruixuan.ChangeMamba&left_color=%2363C7E6&right_color=%23CEE75F)
 
-[**简介**](#简介) | [**开始使用**](#%EF%B8%8F开始使用) | [**结果下载**](#%EF%B8%8F结果下载) | [**常见问题**](#引用) | [**其他**](#联系我们) | [**English Version**](https://github.com/ChenHongruixuan/MambaCD)
+[**简介**](#简介) | [**开始使用**](#%EF%B8%8F开始使用) | [**结果下载**](#%EF%B8%8F结果下载) | [**常见问题**](#常见问题) | [**其他**](#联系我们) | [**English Version**](./README.md)
 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/changemamba-remote-sensing-change-detection/change-detection-on-sysu-cd)](https://paperswithcode.com/sota/change-detection-on-sysu-cd?p=changemamba-remote-sensing-change-detection)
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/changemamba-remote-sensing-change-detection/change-detection-on-levir)](https://paperswithcode.com/sota/change-detection-on-levir?p=changemamba-remote-sensing-change-detection)
@@ -55,15 +55,15 @@
 ### `一、安装`
 此仓库的代码是在 Linux 系统下运行的。我们尚未测试是否能在其他操作系统下运行。
 
-首先需要安装[VMama仓库](https://github.com/MzeroMiko/VMamba)。以下安装顺序取自VMama仓库。
+首先需要安装[VMamba仓库](https://github.com/MzeroMiko/VMamba)。以下安装顺序取自 VMamba 仓库。
 
 
 **步骤 1 —— 克隆仓库:**
 
 克隆该版本库并导航至项目目录：
 ```bash
-git clone https://github.com/ChenHongruixuan/MambaCD.git
-cd MambaCD
+git clone https://github.com/ChenHongruixuan/ChangeMamba.git
+cd ChangeMamba
 ```
 
 
@@ -93,10 +93,10 @@ pip install mmengine==0.10.1 mmcv==2.1.0 opencv-python-headless ftfy regex
 pip install mmdet==3.3.0 mmsegmentation==1.2.2 mmpretrain==1.2.0
 ```
 ### `二、下载预训练权重`
-另外，请下载[VMamba-Tiny](https://zenodo.org/records/14037769), [VMamba-Small](https://zenodo.org/records/14037769), and [VMamba-Base](https://zenodo.org/records/14037769)在ImageNet上的预训练权重并把它们放在下述文件夹中 
+另外，请下载 [VMamba-Tiny](https://zenodo.org/records/14037769)、[VMamba-Small](https://zenodo.org/records/14037769) 和 [VMamba-Base](https://zenodo.org/records/14037769) 在 ImageNet 上的预训练权重，并把它们放在下述文件夹中：
 
 ```bash
-project_path/MambaCD/pretrained_weight/
+project_path/ChangeMamba/pretrained_weight/
 ```
 
 ### `三、数据准备`
@@ -129,9 +129,9 @@ ${DATASET_ROOT}   # 数据集根目录，例如: /home/username/data/SYSU
 │   ├── ...
 │   ...
 │ 
-├── train.txt   # 数据名称列表，记录所有训练数据的名称
-├── val.txt     # 数据名称列表，记录所有验证数据的名称
-└── test.txt    # 数据名称列表，记录所有测试数据的名称
+├── train_set.txt   # 数据名称列表，记录所有训练数据的名称
+├── val_set.txt     # 数据名称列表，记录所有验证数据的名称
+└── test_set.txt    # 数据名称列表，记录所有测试数据的名称
 ```
 
 ***语义变化检测***
@@ -169,8 +169,8 @@ ${DATASET_ROOT}   # 数据集根目录，例如 /home/username/data/SECOND
 │   ├── ...
 │   ...
 │ 
-├── train.txt
-└── test.txt
+├── train_set.txt
+└── test_set.txt
 ```
 
 ***建筑物损坏评估***
@@ -184,7 +184,7 @@ ${DATASET_ROOT}   # 数据集根目录，例如：/home/username/data/xBD
 │   │   ├──guatemala-volcano_00000000_post_disaster.png
 │   │   ...
 │   │
-│   └── targets
+│   └── masks
 │       ├──guatemala-volcano_00000003_pre_disaster_target.png
 │       ├──guatemala-volcano_00000003_post_disaster_target.png
 │       ... 
@@ -197,9 +197,9 @@ ${DATASET_ROOT}   # 数据集根目录，例如：/home/username/data/xBD
 │   ├── ...
 │   ...
 │
-├── train.txt # 数据名称列表，记录所有训练数据的名称
-├── test.txt  # 数据名称列表，记录所有测试数据的名称
-└── holdout.txt  # 数据名称列表，记录所有留出集数据的名称
+├── train_set.txt    # 数据名称列表，记录所有训练数据的名称
+├── test_set.txt     # 数据名称列表，记录所有测试数据的名称
+└── holdout_set.txt  # 数据名称列表，记录所有留出集数据的名称
 ```
 
 
@@ -207,7 +207,7 @@ ${DATASET_ROOT}   # 数据集根目录，例如：/home/username/data/xBD
 在训练模型之前，请进入 [`changedetection`]文件夹，其中包含网络定义、训练和测试的所有代码。
 
 ```bash
-cd <project_path>/MambaCD/changedetection
+cd <project_path>/ChangeMamba/changedetection
 ```
 
 ***二元变化检测***
@@ -219,13 +219,13 @@ python script/train_MambaBCD.py  --dataset 'SYSU' \
                                  --crop_size 256 \
                                  --max_iters 50000 \
                                  --model_type MambaBCD_Small \
-                                 --model_param_path '<project_path>/MambaCD/changedetection/saved_models' \ 
+                                 --model_param_path '<project_path>/ChangeMamba/changedetection/saved_models' \
                                  --train_dataset_path '<dataset_path>/SYSU/train' \
-                                 --train_data_list_path '<dataset_path>/SYSU/train_list.txt' \
+                                 --train_data_list_path '<dataset_path>/SYSU/train_set.txt' \
                                  --test_dataset_path '<dataset_path>/SYSU/test' \
-                                 --test_data_list_path '<dataset_path>/SYSU/test_list.txt'
-                                 --cfg '<project_path>/MambaCD/changedetection/configs/vssm1/vssm_small_224.yaml' \
-                                 --pretrained_weight_path '<project_path>/MambaCD/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
+                                 --test_data_list_path '<dataset_path>/SYSU/test_set.txt' \
+                                 --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_small_224.yaml' \
+                                 --pretrained_weight_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
 ```
 
 ***语义变化检测***
@@ -237,16 +237,16 @@ python script/train_MambaSCD.py  --dataset 'SECOND' \
                                  --crop_size 512 \
                                  --max_iters 50000 \
                                  --model_type MambaSCD_Small \
-                                 --model_param_path '<project_path>/MambaCD/changedetection/saved_models' \ 
+                                 --model_param_path '<project_path>/ChangeMamba/changedetection/saved_models' \
                                  --train_dataset_path '<dataset_path>/SECOND/train' \
-                                 --train_data_list_path '<dataset_path>/SECOND/train_list.txt' \
+                                 --train_data_list_path '<dataset_path>/SECOND/train_set.txt' \
                                  --test_dataset_path '<dataset_path>/SECOND/test' \
-                                 --test_data_list_path '<dataset_path>/SECOND/test_list.txt'
-                                 --cfg '<project_path>/MambaCD/changedetection/configs/vssm1/vssm_small_224.yaml' \
-                                 --pretrained_weight_path '<project_path>/MambaCD/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
+                                 --test_data_list_path '<dataset_path>/SECOND/test_set.txt' \
+                                 --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_small_224.yaml' \
+                                 --pretrained_weight_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
 ```
 
-***Building Damge Assessment***
+***Building Damage Assessment***
 
 运行以下命令在 xBD 数据集上训练和评估 MambaBDA-Small：
 ```bash
@@ -255,19 +255,19 @@ python script/train_MambaBDA.py  --dataset 'xBD' \
                                  --crop_size 512 \
                                  --max_iters 80000 \
                                  --model_type MambaBDA_Small \
-                                 --model_param_path '<project_path>/MambaCD/changedetection/saved_models' \ 
+                                 --model_param_path '<project_path>/ChangeMamba/changedetection/saved_models' \
                                  --train_dataset_path '<dataset_path>/xBD/train' \
-                                 --train_data_list_path '<dataset_path>/xBD/train_list.txt' \
+                                 --train_data_list_path '<dataset_path>/xBD/train_set.txt' \
                                  --test_dataset_path '<dataset_path>/xBD/test' \
-                                 --test_data_list_path '<dataset_path>/xBD/test_list.txt'
-                                 --cfg '<project_path>/MambaCD/changedetection/configs/vssm1/vssm_small_224.yaml' \
-                                 --pretrained_weight_path '<project_path>/MambaCD/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
+                                 --test_data_list_path '<dataset_path>/xBD/test_set.txt' \
+                                 --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_small_224.yaml' \
+                                 --pretrained_weight_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
 ```
 ### `五、使用训练完成后的权重进行推理`
 
 推理前，请先通过命令行进入 [`changedetection`]文件夹。
 ```bash
-cd <project_path>/MambaCD/changedetection
+cd <project_path>/ChangeMamba/changedetection
 ```
 
 
@@ -281,8 +281,8 @@ cd <project_path>/MambaCD/changedetection
 python script/infer_MambaBCD.py  --dataset 'LEVIR-CD+' \
                                  --model_type 'MambaBCD_Tiny' \
                                  --test_dataset_path '<dataset_path>/LEVIR-CD+/test' \
-                                 --test_data_list_path '<dataset_path>/LEVIR-CD+/test_list.txt' \
-                                 --cfg '<project_path>/MambaCD/changedetection/configs/vssm1/vssm_tiny_224_0229flex.yaml' \
+                                 --test_data_list_path '<dataset_path>/LEVIR-CD+/test_set.txt' \
+                                 --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_tiny_224_0229flex.yaml' \
                                  --resume '<saved_model_path>/MambaBCD_Tiny_LEVIRCD+_F1_0.8803.pth'
 ```
 
@@ -290,23 +290,23 @@ python script/infer_MambaBCD.py  --dataset 'LEVIR-CD+' \
 
 以下命令展示了如何在 SECOND 数据集上使用训练完成的 MambaSCD-Tiny 推断语义变化图：
 ```bash
-python script/infer_MambaBCD.py  --dataset 'SECOND'  \
+python script/infer_MambaSCD.py  --dataset 'SECOND'  \
                                  --model_type 'MambaSCD_Tiny' \
                                  --test_dataset_path '<dataset_path>/SECOND/test' \
-                                 --test_data_list_path '<dataset_path>/SECOND/test_list.txt' \
-                                 --cfg '<project_path>/MambaCD/changedetection/configs/vssm1/vssm_tiny_224_0229flex.yaml' \
+                                 --test_data_list_path '<dataset_path>/SECOND/test_set.txt' \
+                                 --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_tiny_224_0229flex.yaml' \
                                  --resume '<saved_model_path>/[your_trained_model].pth'
 ```
 
-***建筑物损害评估***
+***建筑物损坏评估***
 
-以下命令展示了如何在 xBD 数据集上使用训练完成的 MambaBDA-Tiny 推断语义变化图：
+以下命令展示了如何在 xBD 数据集上使用训练完成的 MambaBDA-Tiny 推断建筑物损坏评估结果：
 ```bash
-python script/infer_MambaBDA.py  --dataset 'SECOND'  \
+python script/infer_MambaBDA.py  --dataset 'xBD'  \
                                  --model_type 'MambaBDA_Tiny' \
                                  --test_dataset_path '<dataset_path>/xBD/test' \
-                                 --test_data_list_path '<dataset_path>/xBD/test_list.txt' \
-                                 --cfg '<project_path>/MambaCD/changedetection/configs/vssm1/vssm_tiny_224_0229flex.yaml' \
+                                 --test_data_list_path '<dataset_path>/xBD/test_set.txt' \
+                                 --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_tiny_224_0229flex.yaml' \
                                  --resume '<saved_model_path>/[your_trained_model].pth'
 ```
 
@@ -353,12 +353,12 @@ python script/infer_MambaBDA.py  --dataset 'SECOND'  \
 
 | 问题 | 解决方案 | 
 | :---: | :---: | 
-| 关于SECOND数据集的问题 | 请参考 Issue [#13](https://github.com/ChenHongruixuan/MambaCD/issues/13) / [#22](https://github.com/ChenHongruixuan/MambaCD/issues/22) / [#45](https://github.com/ChenHongruixuan/MambaCD/issues/45) |
+| 关于 SECOND 数据集的问题 | 请参考 Issue [#13](https://github.com/ChenHongruixuan/ChangeMamba/issues/13) / [#22](https://github.com/ChenHongruixuan/ChangeMamba/issues/22) / [#45](https://github.com/ChenHongruixuan/ChangeMamba/issues/45) |
 | CUDA out of memory issue | 请降低训练和评估的batch size  |
-| 修改模型结构 | 请参考 Issue [#44](https://github.com/ChenHongruixuan/MambaCD/issues/44)  |
-| 关于iteration、epoch和batch size之间的关系 | 请参考 Issue [#32](https://github.com/ChenHongruixuan/MambaCD/issues/32) / [#48](https://github.com/ChenHongruixuan/MambaCD/issues/48)  |
-NameError: name 'selective_scan_cuda_oflex' is not defined | 请参考 Issue [#9](https://github.com/ChenHongruixuan/MambaCD/issues/9) | 
-推理阶段精度很低 | 请用 --resume 加载模型，而不是用 --pretrained_weight_path 加载模型 | 
+| 修改模型结构 | 请参考 Issue [#44](https://github.com/ChenHongruixuan/ChangeMamba/issues/44) |
+| 关于 iteration、epoch 和 batch size 之间的关系 | 请参考 Issue [#32](https://github.com/ChenHongruixuan/ChangeMamba/issues/32) / [#48](https://github.com/ChenHongruixuan/ChangeMamba/issues/48) |
+| NameError: name 'selective_scan_cuda_oflex' is not defined | 请参考 Issue [#9](https://github.com/ChenHongruixuan/ChangeMamba/issues/9) |
+| 推理阶段精度很低 | 请用 `--resume` 加载模型，而不是用 `--pretrained_weight_path` 加载模型 |
 
 
 ## 📜引用
@@ -384,4 +384,4 @@ NameError: name 'selective_scan_cuda_oflex' is not defined | 请参考 Issue [#9
 ## 🙋联系我们
 ***如有任何问题，请随时[联系我们。](mailto:Qschrx@gmail.com)***
 
-[![Star History Chart](https://api.star-history.com/svg?repos=ChenHongruixuan/MambaCD&type=Date)](https://star-history.com/#ChenHongruixuan/MambaCD&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=ChenHongruixuan/ChangeMamba&type=Date)](https://star-history.com/#ChenHongruixuan/ChangeMamba&Date)
