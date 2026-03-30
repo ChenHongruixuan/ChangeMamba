@@ -20,10 +20,10 @@ ${PYTHON_BIN} ${PROJECT_ROOT}/changedetection/script/train_MambaBCD.py \
     --dataset 'SYSU' \
     --model_type 'ChangeMamba-BCD' \
     --model_param_path ${PROJECT_ROOT}/results/checkpoints \
-    --train_dataset_path ${DATA_ROOT} \
-    --train_data_list_path ${LIST_ROOT}/train_list.txt \
-    --test_dataset_path ${DATA_ROOT} \
-    --test_data_list_path ${LIST_ROOT}/test_list.txt \
+    --train_dataset_path ${DATA_ROOT}/train \
+    --train_data_list_path ${LIST_ROOT}/train_set.txt \
+    --test_dataset_path ${DATA_ROOT}/test \
+    --test_data_list_path ${LIST_ROOT}/test_set.txt \
     --pretrained_weight_path ${PROJECT_ROOT}/pretrained_weight/vssm_tiny_0230_ckpt_epoch_262.pth \
     --batch_size 16 \
     --crop_size 256 \
