@@ -20,7 +20,8 @@
 
 ## 🛎️Updates
 * **` Notice🐍🐍`**: ChangeMamba has been accepted by [IEEE TGRS](https://ieeexplore.ieee.org/document/10565926)! We'd appreciate it if you could give this repo a ⭐️**star**⭐️ and stay tuned!!
-* **` Mar. 30th, 2026`**: We have removed unnecessary code to streamline the repo. Additionally, ChangeMamba has once again been selected as 🔥ESI Hot Paper and Highly Cited Paper🏆!!
+* **` Mar. 30th, 2026`**: We have reorganized code to streamline the repo!!
+* **` Mar. 14th, 2026`**: ChangeMamba has once again been selected as 🔥ESI Hot Paper and Highly Cited Paper🏆!!
 * **` May 21st, 2025`**: We have updated the script to train ChangeMamba on [BRIGHT dataset](https://github.com/ChenHongruixuan/BRIGHT) and released [model's checkpoints](https://zenodo.org/records/14037769)!!
 * **` Nov. 13th, 2025`**: ChangeMamba has been selected as 🔥ESI Hot Paper and Highly Cited Paper🏆 for 12 consecutive months!!
 * **` Nov. 14th, 2024`**: ChangeMamba has been selected as 🔥ESI Hot Paper🔥!!
@@ -81,13 +82,13 @@ pip install -r requirements.txt
 cd kernels/selective_scan && pip install .
 ```
 
-
+<!-- 
 ***Dependencies for "Detection" and "Segmentation" (optional in VMamba)***
 
 ```bash
 pip install mmengine==0.10.1 mmcv==2.1.0 opencv-python-headless ftfy regex
 pip install mmdet==3.3.0 mmsegmentation==1.2.2 mmpretrain==1.2.0
-```
+``` -->
 ### `B. Download Pretrained Weight`
 Also, please download the pretrained weights of [VMamba-Tiny](https://zenodo.org/records/14037769), [VMamba-Small](https://zenodo.org/records/14037769), and [VMamba-Base](https://zenodo.org/records/14037769) and put them under 
 ```bash

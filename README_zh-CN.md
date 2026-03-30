@@ -24,7 +24,8 @@
 
 ## 🛎️更新日志
 * **` 通知🐍🐍`**: ChangeMamba已经被 [IEEE TGRS](https://ieeexplore.ieee.org/document/10565926) 接收！仓库的代码已更新完毕！如果对您的研究有所帮助，请考虑给该仓库一个⭐️**star**⭐️！
-* **` 2026年03月30日`**: 我们清理了无关的代码，让repo更加简洁。并且ChangeMamba继续入选🔥ESI热点和高被引论文🏆！！
+* **` 2026年03月30日`**: 我们清理了无关的代码然后重构了当前的训练、评估和模型文件代码，让repo更加简洁。
+* **` 2026年03月14日`**: ChangeMamba继续入选🔥ESI热点和高被引论文🏆！！
 * **` 2025年05月21日`**: 更新了ChangeMamba在[BRIGHT数据集](https://github.com/ChenHongruixuan/BRIGHT)上的训练代码和[模型权重](https://zenodo.org/records/14037769)！！
 * **` 2025年12月13日`**: ChangeMamba连续12个月入选🔥ESI热点和高被引论文🏆！！
 * **` 2024年11月14日`**: ChangeMamba入选为🔥ESI 热点论文🔥！！
@@ -86,12 +87,12 @@ cd kernels/selective_scan && pip install .
 ```
 
 
-***检测和分割任务的依赖库（在 VMamba 中为可选项）***
+<!-- ***检测和分割任务的依赖库（在 VMamba 中为可选项）***
 
 ```bash
 pip install mmengine==0.10.1 mmcv==2.1.0 opencv-python-headless ftfy regex
 pip install mmdet==3.3.0 mmsegmentation==1.2.2 mmpretrain==1.2.0
-```
+``` -->
 ### `二、下载预训练权重`
 另外，请下载 [VMamba-Tiny](https://zenodo.org/records/14037769)、[VMamba-Small](https://zenodo.org/records/14037769) 和 [VMamba-Base](https://zenodo.org/records/14037769) 在 ImageNet 上的预训练权重，并把它们放在下述文件夹中：
 
