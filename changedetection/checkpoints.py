@@ -1,4 +1,5 @@
 import os
+import re
 from collections.abc import Mapping
 
 import torch
@@ -36,26 +37,136 @@ def extract_model_state_dict(checkpoint):
     raise TypeError(f"Unsupported checkpoint format: {type(checkpoint)!r}")
 
 
+def _indexed_module_count(model_state, prefix, cache):
+    cached = cache.get(prefix)
+    if cached is not None:
+        return cached
+
+    indices = set()
+    prefix_len = len(prefix)
+    for key in model_state:
+        if not key.startswith(prefix):
+            continue
+        index_token = key[prefix_len:].split(".", 1)[0]
+        if index_token.isdigit():
+            indices.add(int(index_token))
+
+    count = max(indices) + 1 if indices else 0
+    cache[prefix] = count
+    return count
+
+
+def _resolve_change_decoder_legacy_key(key, model_state, count_cache):
+    submodule_match = re.match(r"(?P<prefix>.+?\.)st_block_(?P<stage>\d+)(?P<sub>\d)\.(?P<rest>.*)$", key)
+    if submodule_match:
+        prefix = submodule_match.group("prefix")
+        stage_count = _indexed_module_count(model_state, f"{prefix}stage_blocks.", count_cache)
+        stage = int(submodule_match.group("stage"))
+        new_stage_idx = stage_count - stage
+        submodule_name = {"1": "cat", "2": "interleave", "3": "split"}.get(submodule_match.group("sub"))
+        if submodule_name is not None and 0 <= new_stage_idx < stage_count:
+            candidate = f"{prefix}stage_blocks.{new_stage_idx}.{submodule_name}.{submodule_match.group('rest')}"
+            if candidate in model_state:
+                return candidate
+
+    fuse_match = re.match(r"(?P<prefix>.+?\.)fuse_layer_(?P<stage>\d+)\.(?P<rest>.*)$", key)
+    if fuse_match:
+        prefix = fuse_match.group("prefix")
+        fuse_count = _indexed_module_count(model_state, f"{prefix}fuse_layers.", count_cache)
+        stage = int(fuse_match.group("stage"))
+        new_stage_idx = fuse_count - stage
+        if 0 <= new_stage_idx < fuse_count:
+            candidate = f"{prefix}fuse_layers.{new_stage_idx}.{fuse_match.group('rest')}"
+            if candidate in model_state:
+                return candidate
+
+    smooth_match = re.match(r"(?P<prefix>.+?\.)smooth_layer_(?P<stage>\d+)\.(?P<rest>.*)$", key)
+    if smooth_match:
+        prefix = smooth_match.group("prefix")
+        smooth_count = _indexed_module_count(model_state, f"{prefix}smooth_layers.", count_cache)
+        stage = int(smooth_match.group("stage"))
+        new_stage_idx = smooth_count - stage
+        if 0 <= new_stage_idx < smooth_count:
+            candidate = f"{prefix}smooth_layers.{new_stage_idx}.{smooth_match.group('rest')}"
+            if candidate in model_state:
+                return candidate
+
+    return key
+
+
+def _resolve_semantic_decoder_legacy_key(key, model_state, count_cache):
+    stage_match = re.match(r"(?P<prefix>.+?\.)st_block_(?P<stage>\d+)_semantic\.(?P<rest>.*)$", key)
+    if stage_match:
+        prefix = stage_match.group("prefix")
+        stage_count = _indexed_module_count(model_state, f"{prefix}stage_blocks.", count_cache)
+        stage = int(stage_match.group("stage"))
+        new_stage_idx = stage_count - stage
+        if 0 <= new_stage_idx < stage_count:
+            candidate = f"{prefix}stage_blocks.{new_stage_idx}.{stage_match.group('rest')}"
+            if candidate in model_state:
+                return candidate
+
+    transition_match = re.match(r"(?P<prefix>.+?\.)trans_layer_(?P<stage>\d+)\.(?P<rest>.*)$", key)
+    if transition_match:
+        prefix = transition_match.group("prefix")
+        transition_count = _indexed_module_count(model_state, f"{prefix}transition_layers.", count_cache)
+        stage = int(transition_match.group("stage"))
+        new_stage_idx = transition_count - stage
+        if 0 <= new_stage_idx < transition_count:
+            candidate = f"{prefix}transition_layers.{new_stage_idx}.{transition_match.group('rest')}"
+            if candidate in model_state:
+                return candidate
+
+    smooth_match = re.match(r"(?P<prefix>.+?\.)smooth_layer_(?P<stage>\d+)_semantic\.(?P<rest>.*)$", key)
+    if smooth_match:
+        prefix = smooth_match.group("prefix")
+        smooth_count = _indexed_module_count(model_state, f"{prefix}smooth_layers.", count_cache)
+        stage = int(smooth_match.group("stage"))
+        new_stage_idx = smooth_count - 1 - stage
+        if 0 <= new_stage_idx < smooth_count:
+            candidate = f"{prefix}smooth_layers.{new_stage_idx}.{smooth_match.group('rest')}"
+            if candidate in model_state:
+                return candidate
+
+    return key
+
+
+def _resolve_legacy_checkpoint_key(key, model_state, count_cache):
+    remapped_key = _resolve_semantic_decoder_legacy_key(key, model_state, count_cache)
+    if remapped_key != key:
+        return remapped_key
+    return _resolve_change_decoder_legacy_key(key, model_state, count_cache)
+
+
 def _match_state_dict(model, checkpoint_state_dict):
     model_state = model.state_dict()
     matched = {}
     unexpected = []
     mismatched = []
+    remapped_legacy_keys = []
+    count_cache = {}
 
     for key, value in checkpoint_state_dict.items():
+        resolved_key = key
         if key not in model_state:
+            resolved_key = _resolve_legacy_checkpoint_key(key, model_state, count_cache)
+            if resolved_key != key:
+                remapped_legacy_keys.append({"source": key, "target": resolved_key})
+
+        if resolved_key not in model_state:
             unexpected.append(key)
             continue
-        if getattr(model_state[key], "shape", None) != getattr(value, "shape", None):
+        if getattr(model_state[resolved_key], "shape", None) != getattr(value, "shape", None):
             mismatched.append(
                 {
-                    "key": key,
-                    "model_shape": tuple(model_state[key].shape),
+                    "key": resolved_key,
+                    "source_key": key,
+                    "model_shape": tuple(model_state[resolved_key].shape),
                     "checkpoint_shape": tuple(value.shape),
                 }
             )
             continue
-        matched[key] = value
+        matched[resolved_key] = value
 
     merged_state = dict(model_state)
     merged_state.update(matched)
@@ -65,6 +176,7 @@ def _match_state_dict(model, checkpoint_state_dict):
         "missing_keys": sorted(set(model_state) - set(matched)),
         "unexpected_keys": unexpected,
         "mismatched_keys": mismatched,
+        "remapped_legacy_keys": remapped_legacy_keys,
     }
 
 
@@ -98,6 +210,17 @@ def _preview_mismatched_keys(items, max_items=6):
     return preview_items
 
 
+def _preview_remapped_keys(items, max_items=6):
+    if not items:
+        return "[]"
+    preview_items = []
+    for item in items[:max_items]:
+        preview_items.append(f"{item['source']} -> {item['target']}")
+    if len(items) > max_items:
+        preview_items.append(f"... (+{len(items) - max_items} more)")
+    return preview_items
+
+
 def format_checkpoint_load_report(load_info, title="CHECKPOINT Load"):
     values = {
         "matched": load_info["loaded_keys"],
@@ -105,12 +228,16 @@ def format_checkpoint_load_report(load_info, title="CHECKPOINT Load"):
         "unexpected": len(load_info["unexpected_keys"]),
         "mismatched": len(load_info["mismatched_keys"]),
     }
+    if load_info.get("remapped_legacy_keys"):
+        values["legacy_remapped"] = len(load_info["remapped_legacy_keys"])
     if load_info["missing_keys"]:
         values["missing_preview"] = _preview_sequence(load_info["missing_keys"])
     if load_info["unexpected_keys"]:
         values["unexpected_preview"] = _preview_sequence(load_info["unexpected_keys"])
     if load_info["mismatched_keys"]:
         values["mismatched_preview"] = _preview_mismatched_keys(load_info["mismatched_keys"])
+    if load_info.get("remapped_legacy_keys"):
+        values["legacy_remap_preview"] = _preview_remapped_keys(load_info["remapped_legacy_keys"])
     return format_log_block(
         title,
         values,
