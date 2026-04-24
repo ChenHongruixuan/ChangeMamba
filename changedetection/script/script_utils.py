@@ -1,3 +1,6 @@
+import argparse
+import warnings
+
 import numpy as np
 
 from changedetection.checkpoints import load_model_weights
@@ -7,7 +10,7 @@ def get_vssm_kwargs(config):
     """Extract all VSSM backbone parameters from config into a dict.
 
     Usage:
-        model = ChangeMambaBCD(pretrained=args.pretrained_weight_path, **get_vssm_kwargs(config))
+        model = ChangeMambaBCD(pretrained=args.encoder_pretrained_path, **get_vssm_kwargs(config))
     """
     return dict(
         patch_size=config.MODEL.VSSM.PATCH_SIZE,
@@ -36,6 +39,85 @@ def get_vssm_kwargs(config):
         gmlp=config.MODEL.VSSM.GMLP,
         use_checkpoint=config.TRAIN.USE_CHECKPOINT,
     )
+
+
+def add_weight_loading_args(parser, *, allow_model_checkpoint=False, allow_resume_training=False):
+    parser.add_argument(
+        "--encoder_pretrained_path",
+        type=str,
+        help="Path to encoder/backbone pretrained weights.",
+    )
+    if allow_model_checkpoint:
+        parser.add_argument(
+            "--model_checkpoint_path",
+            type=str,
+            help="Path to a full ChangeMamba model checkpoint or state dict.",
+        )
+    if allow_resume_training:
+        parser.add_argument(
+            "--resume_training_path",
+            type=str,
+            help="Path to a training checkpoint used to restore model and optimizer state.",
+        )
+
+    # Deprecated compatibility aliases.
+    parser.add_argument("--pretrained_weight_path", type=str, help=argparse.SUPPRESS)
+    if allow_model_checkpoint or allow_resume_training:
+        parser.add_argument("--resume", type=str, help=argparse.SUPPRESS)
+
+
+def _resolve_cli_alias(args, *, primary_name, legacy_name, parser, legacy_replacement):
+    primary_value = getattr(args, primary_name, None)
+    legacy_value = getattr(args, legacy_name, None)
+    if primary_value and legacy_value and primary_value != legacy_value:
+        parser.error(f"Conflicting values were provided for --{primary_name} and --{legacy_name}.")
+    if primary_value:
+        return primary_value
+    if legacy_value:
+        warnings.warn(
+            f"--{legacy_name} is deprecated; use --{legacy_replacement} instead.",
+            stacklevel=3,
+        )
+        return legacy_value
+    return None
+
+
+def normalize_weight_loading_args(args, parser, *, mode):
+    args.encoder_pretrained_path = _resolve_cli_alias(
+        args,
+        primary_name="encoder_pretrained_path",
+        legacy_name="pretrained_weight_path",
+        parser=parser,
+        legacy_replacement="encoder_pretrained_path",
+    )
+
+    if mode == "train":
+        args.model_checkpoint_path = getattr(args, "model_checkpoint_path", None)
+        args.resume_training_path = _resolve_cli_alias(
+            args,
+            primary_name="resume_training_path",
+            legacy_name="resume",
+            parser=parser,
+            legacy_replacement="resume_training_path",
+        )
+        if args.model_checkpoint_path and args.resume_training_path:
+            parser.error(
+                "--model_checkpoint_path and --resume_training_path cannot be used together. "
+                "Use the former for weight-only initialization and the latter for full training resume."
+            )
+    elif mode == "infer":
+        args.model_checkpoint_path = _resolve_cli_alias(
+            args,
+            primary_name="model_checkpoint_path",
+            legacy_name="resume",
+            parser=parser,
+            legacy_replacement="model_checkpoint_path",
+        )
+        args.resume_training_path = None
+    else:
+        raise ValueError(f"Unsupported weight loading mode: {mode}")
+
+    return args
 
 
 def load_checkpoint(model, path):

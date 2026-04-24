@@ -6,6 +6,17 @@ import torch
 
 from changedetection.logging_utils import format_log_block
 
+_FULL_MODEL_CHECKPOINT_PREFIXES = (
+    "encoder.",
+    "encoder_1.",
+    "encoder_2.",
+    "decoder.",
+    "decoder_",
+    "main_clf",
+    "main_clf_",
+    "aux_clf",
+)
+
 
 def _read_checkpoint(path):
     if not os.path.isfile(path):
@@ -187,6 +198,25 @@ def load_model_weights(model, path):
     return load_info
 
 
+def _looks_like_full_model_state_dict(state_dict):
+    return any(key.startswith(_FULL_MODEL_CHECKPOINT_PREFIXES) for key in state_dict)
+
+
+def load_encoder_pretrained_weights(model, path):
+    checkpoint = _read_checkpoint(path)
+    state_dict = extract_model_state_dict(checkpoint)
+    if _looks_like_full_model_state_dict(state_dict):
+        raise RuntimeError(
+            "The provided checkpoint looks like a full ChangeMamba model checkpoint, not encoder-only pretrained "
+            "weights. Use --model_checkpoint_path for full-model loading or --resume_training_path for training "
+            "resume."
+        )
+
+    load_info = _match_state_dict(model, state_dict)
+    load_info["path"] = path
+    return load_info
+
+
 def _preview_sequence(items, max_items=8):
     items = list(items)
     if not items:
@@ -258,19 +288,20 @@ def _safe_load_component(component, state_dict, component_name):
 def resume_training_state(path, *, model, optimizer=None, scheduler=None):
     checkpoint = _read_checkpoint(path)
     load_info = _match_state_dict(model, extract_model_state_dict(checkpoint))
+    checkpoint_is_mapping = isinstance(checkpoint, Mapping)
 
     optimizer_loaded, optimizer_error = _safe_load_component(
         optimizer,
-        checkpoint.get("optimizer") if isinstance(checkpoint, Mapping) else None,
+        checkpoint.get("optimizer") if checkpoint_is_mapping else None,
         "optimizer",
     )
     scheduler_loaded, scheduler_error = _safe_load_component(
         scheduler,
-        checkpoint.get("scheduler") if isinstance(checkpoint, Mapping) else None,
+        checkpoint.get("scheduler") if checkpoint_is_mapping else None,
         "scheduler",
     )
 
-    if not isinstance(checkpoint, Mapping):
+    if not checkpoint_is_mapping:
         checkpoint = {}
 
     return {
@@ -286,6 +317,9 @@ def resume_training_state(path, *, model, optimizer=None, scheduler=None):
         "optimizer_error": optimizer_error,
         "scheduler_loaded": scheduler_loaded,
         "scheduler_error": scheduler_error,
+        "has_optimizer_state": checkpoint.get("optimizer") is not None,
+        "has_scheduler_state": checkpoint.get("scheduler") is not None,
+        "has_iteration_state": any(key in checkpoint for key in ("iteration", "iter")),
         "load_info": load_info,
     }
 

@@ -1,5 +1,5 @@
 import torch.nn as nn
-from changedetection.checkpoints import format_checkpoint_load_report, load_model_weights
+from changedetection.checkpoints import format_checkpoint_load_report, load_encoder_pretrained_weights
 from .vmamba import VSSM, LayerNorm2d
 
 
@@ -29,7 +29,7 @@ class Backbone_VSSM(VSSM):
             return
 
         try:
-            load_info = load_model_weights(self, ckpt)
+            load_info = load_encoder_pretrained_weights(self, ckpt)
             print(format_checkpoint_load_report(load_info, title="PRETRAIN Load"))
         except Exception as e:
             print(f"Failed loading checkpoint form {ckpt}: {e}")

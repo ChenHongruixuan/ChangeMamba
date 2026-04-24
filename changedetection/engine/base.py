@@ -34,7 +34,14 @@ class BaseTrainer:
         self.runtime_spec = get_task_runtime_spec(self.task_name)
         if self.runtime_spec is not None:
             self.eval_interval = self.runtime_spec.eval_interval
-        self.resume_path = self._resolve_resume_path()
+        self.model_checkpoint_path = self._resolve_model_checkpoint_path()
+        self.resume_training_path = self._resolve_resume_training_path()
+        if self.model_checkpoint_path is not None and self.resume_training_path is not None:
+            raise ValueError(
+                "Both model checkpoint loading and training resume were requested. "
+                "Use --model_checkpoint_path for weight-only initialization or --resume_training_path for full "
+                "training resume."
+            )
         self.start_iteration = int(getattr(args, "start_iter", 0) or 0)
         self.best_score = None
         self.best_record = None
@@ -42,13 +49,16 @@ class BaseTrainer:
         self.train_loader = self.build_train_loader()
         self.eval_loaders = self.build_eval_loaders()
         self.model = self.build_model(self.config).to(self.device)
+        if self.model_checkpoint_path is not None:
+            load_info = load_model_weights(self.model, self.model_checkpoint_path)
+            self.emit_log(format_checkpoint_load_report(load_info, title="INIT Model"))
         self.optimizer = self.build_optimizer()
         self.scheduler = self.build_scheduler()
 
         self.model_save_path = self._resolve_model_save_path()
         os.makedirs(self.model_save_path, exist_ok=True)
 
-        if self.resume_path is not None:
+        if self.resume_training_path is not None:
             self._resume_from_checkpoint()
 
     def build_model(self, config):
@@ -60,16 +70,26 @@ class BaseTrainer:
     def build_eval_loaders(self):
         return {}
 
-    def _resolve_resume_path(self):
-        resume_path = getattr(self.args, "resume", None)
+    def _resolve_model_checkpoint_path(self):
+        checkpoint_path = getattr(self.args, "model_checkpoint_path", None)
+        if checkpoint_path:
+            return checkpoint_path
+        config_checkpoint = getattr(self.config.MODEL, "CHECKPOINT", "")
+        if config_checkpoint:
+            return config_checkpoint
+        config_resume = getattr(self.config.MODEL, "RESUME", "")
+        return config_resume or None
+
+    def _resolve_resume_training_path(self):
+        resume_path = getattr(self.args, "resume_training_path", None)
         if resume_path:
             return resume_path
         config_resume = getattr(self.config.MODEL, "RESUME", "")
         return config_resume or None
 
     def _resolve_model_save_path(self):
-        if self.resume_path and os.path.isfile(self.resume_path):
-            return os.path.dirname(os.path.abspath(self.resume_path))
+        if self.resume_training_path and os.path.isfile(self.resume_training_path):
+            return os.path.dirname(os.path.abspath(self.resume_training_path))
         return os.path.join(
             self.args.model_param_path,
             self.args.dataset,
@@ -92,7 +112,7 @@ class BaseTrainer:
 
     def _resume_from_checkpoint(self):
         resume_state = resume_training_state(
-            self.resume_path,
+            self.resume_training_path,
             model=self.model,
             optimizer=self.optimizer,
             scheduler=self.scheduler,
@@ -118,6 +138,18 @@ class BaseTrainer:
             self.emit_log(resume_state["optimizer_error"])
         if resume_state["scheduler_error"] is not None:
             self.emit_log(resume_state["scheduler_error"])
+        if not any(
+            (
+                resume_state["has_optimizer_state"],
+                resume_state["has_scheduler_state"],
+                resume_state["has_iteration_state"],
+            )
+        ):
+            self.emit_log(
+                "Resume checkpoint contained model weights only. Optimizer/scheduler/iteration state were not "
+                "found, so training restarts from iteration 0. Use --model_checkpoint_path for weight-only "
+                "initialization."
+            )
 
     def build_optimizer(self):
         return optim.AdamW(
@@ -281,12 +313,12 @@ class BaseInferer:
         self.device = torch.device("cuda" if getattr(args, "cuda", True) and torch.cuda.is_available() else "cpu")
         self.use_progress_bar = is_interactive_stream(sys.stderr)
         self.runtime_spec = get_task_runtime_spec(self.task_name)
-        self.resume_path = self._resolve_resume_path()
+        self.model_checkpoint_path = self._resolve_model_checkpoint_path()
 
         self.model = self.build_model(self.config).to(self.device)
-        if self.resume_path is not None:
-            load_info = load_model_weights(self.model, self.resume_path)
-            self.emit_log(format_checkpoint_load_report(load_info, title="INFER Load"))
+        if self.model_checkpoint_path is not None:
+            load_info = load_model_weights(self.model, self.model_checkpoint_path)
+            self.emit_log(format_checkpoint_load_report(load_info, title="CHECKPOINT Load"))
         self.model.eval()
 
         self.data_loader = self.build_data_loader()
@@ -298,12 +330,12 @@ class BaseInferer:
     def build_data_loader(self):
         raise NotImplementedError
 
-    def _resolve_resume_path(self):
-        resume_path = getattr(self.args, "resume", None)
-        if resume_path:
-            return resume_path
-        config_resume = getattr(self.config.MODEL, "RESUME", "")
-        return config_resume or None
+    def _resolve_model_checkpoint_path(self):
+        checkpoint_path = getattr(self.args, "model_checkpoint_path", None)
+        if checkpoint_path:
+            return checkpoint_path
+        config_checkpoint = getattr(self.config.MODEL, "CHECKPOINT", "")
+        return config_checkpoint or None
 
     def build_runtime_data_loader(self):
         if self.runtime_spec is None or self.runtime_spec.infer_loader is None:

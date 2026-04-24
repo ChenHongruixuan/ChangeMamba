@@ -22,7 +22,7 @@ class BDATrainer(BaseTrainer):
         return ChangeMambaBDA(
             output_building=2,
             output_damage=5,
-            pretrained=self.args.pretrained_weight_path,
+            pretrained=self.args.encoder_pretrained_path,
             **get_vssm_kwargs(config),
         )
 
@@ -131,7 +131,7 @@ class BDAInferer(BaseInferer):
         return ChangeMambaBDA(
             output_building=2,
             output_damage=5,
-            pretrained=self.args.pretrained_weight_path,
+            pretrained=self.args.encoder_pretrained_path,
             **get_vssm_kwargs(config),
         )
 

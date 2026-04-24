@@ -56,6 +56,8 @@ _C.MODEL.NAME = 'vssm_tiny_224'
 # Pretrained weight from checkpoint, could be imagenet22k pretrained weight
 # could be overwritten by command line argument
 _C.MODEL.PRETRAINED = ''
+# Full model checkpoint used for inference or weight-only initialization
+_C.MODEL.CHECKPOINT = ''
 # Checkpoint to resume, could be overwritten by command line argument
 _C.MODEL.RESUME = ''
 # Number of classes, overwritten in data preparation
@@ -258,8 +260,14 @@ def update_config(config, args):
         config.DATA.CACHE_MODE = args.cache_mode
     if _check_args('pretrained'):
         config.MODEL.PRETRAINED = args.pretrained
+    if _check_args('encoder_pretrained_path'):
+        config.MODEL.PRETRAINED = args.encoder_pretrained_path
+    if _check_args('model_checkpoint_path'):
+        config.MODEL.CHECKPOINT = args.model_checkpoint_path
     if _check_args('resume'):
         config.MODEL.RESUME = args.resume
+    if _check_args('resume_training_path'):
+        config.MODEL.RESUME = args.resume_training_path
     if _check_args('accumulation_steps'):
         config.TRAIN.ACCUMULATION_STEPS = args.accumulation_steps
     if _check_args('use_checkpoint'):

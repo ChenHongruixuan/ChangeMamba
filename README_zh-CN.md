@@ -226,7 +226,7 @@ python script/train_MambaBCD.py  --dataset 'SYSU' \
                                  --test_dataset_path '<dataset_path>/SYSU/test' \
                                  --test_data_list_path '<dataset_path>/SYSU/test_set.txt' \
                                  --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_small_224.yaml' \
-                                 --pretrained_weight_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
+                                 --encoder_pretrained_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
 ```
 
 ***语义变化检测***
@@ -244,7 +244,7 @@ python script/train_MambaSCD.py  --dataset 'SECOND' \
                                  --test_dataset_path '<dataset_path>/SECOND/test' \
                                  --test_data_list_path '<dataset_path>/SECOND/test_set.txt' \
                                  --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_small_224.yaml' \
-                                 --pretrained_weight_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
+                                 --encoder_pretrained_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
 ```
 
 ***Building Damage Assessment***
@@ -262,7 +262,7 @@ python script/train_MambaBDA.py  --dataset 'xBD' \
                                  --test_dataset_path '<dataset_path>/xBD/test' \
                                  --test_data_list_path '<dataset_path>/xBD/test_set.txt' \
                                  --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_small_224.yaml' \
-                                 --pretrained_weight_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
+                                 --encoder_pretrained_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
 ```
 ### `五、使用训练完成后的权重进行推理`
 
@@ -276,7 +276,11 @@ cd <project_path>/ChangeMamba/changedetection
 
 以下命令展示了如何在 LEVIR-CD+ 数据集上使用训练完成的 MambaBCD-Tiny 推断二元变化图：
 
-* **`提示`**: 请使用 [--resume] 来加载训练过的模型，而不要使用 [--pretrained_weight_path]。 
+* **`参数说明`**:
+  * `--encoder_pretrained_path`: 仅加载编码器 / backbone 预训练权重。
+  * `--model_checkpoint_path`: 加载完整的 ChangeMamba 模型权重，用于推理或仅加载模型参数。
+  * `--resume_training_path`: 恢复训练状态，包含 optimizer / scheduler / iteration。
+* **`历史 Zenodo checkpoints`**: 部分已发布的任务权重只包含模型参数。它们仍然可以通过 `--model_checkpoint_path` 正常加载，但不应被当作完整的训练恢复点。
 
 ```bash
 python script/infer_MambaBCD.py  --dataset 'LEVIR-CD+' \
@@ -284,7 +288,7 @@ python script/infer_MambaBCD.py  --dataset 'LEVIR-CD+' \
                                  --test_dataset_path '<dataset_path>/LEVIR-CD+/test' \
                                  --test_data_list_path '<dataset_path>/LEVIR-CD+/test_set.txt' \
                                  --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_tiny_224_0229flex.yaml' \
-                                 --resume '<saved_model_path>/MambaBCD_Tiny_LEVIRCD+_F1_0.8803.pth'
+                                 --model_checkpoint_path '<saved_model_path>/MambaBCD_Tiny_LEVIRCD+_F1_0.8803.pth'
 ```
 
 ***语义变化检测***
@@ -296,7 +300,7 @@ python script/infer_MambaSCD.py  --dataset 'SECOND'  \
                                  --test_dataset_path '<dataset_path>/SECOND/test' \
                                  --test_data_list_path '<dataset_path>/SECOND/test_set.txt' \
                                  --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_tiny_224_0229flex.yaml' \
-                                 --resume '<saved_model_path>/[your_trained_model].pth'
+                                 --model_checkpoint_path '<saved_model_path>/[your_trained_model].pth'
 ```
 
 ***建筑物损坏评估***
@@ -308,7 +312,7 @@ python script/infer_MambaBDA.py  --dataset 'xBD'  \
                                  --test_dataset_path '<dataset_path>/xBD/test' \
                                  --test_data_list_path '<dataset_path>/xBD/test_set.txt' \
                                  --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_tiny_224_0229flex.yaml' \
-                                 --resume '<saved_model_path>/[your_trained_model].pth'
+                                 --model_checkpoint_path '<saved_model_path>/[your_trained_model].pth'
 ```
 
 ## ⚗️结果下载
@@ -359,7 +363,7 @@ python script/infer_MambaBDA.py  --dataset 'xBD'  \
 | 修改模型结构 | 请参考 Issue [#44](https://github.com/ChenHongruixuan/ChangeMamba/issues/44) |
 | 关于 iteration、epoch 和 batch size 之间的关系 | 请参考 Issue [#32](https://github.com/ChenHongruixuan/ChangeMamba/issues/32) / [#48](https://github.com/ChenHongruixuan/ChangeMamba/issues/48) |
 | NameError: name 'selective_scan_cuda_oflex' is not defined | 请参考 Issue [#9](https://github.com/ChenHongruixuan/ChangeMamba/issues/9) |
-| 推理阶段精度很低 | 请用 `--resume` 加载模型，而不是用 `--pretrained_weight_path` 加载模型 |
+| 推理阶段精度很低 | 请用 `--model_checkpoint_path` 加载模型，而不是用 `--encoder_pretrained_path` 加载模型 |
 
 
 ## 📜引用

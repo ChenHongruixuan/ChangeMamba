@@ -13,7 +13,11 @@ import torch.utils.checkpoint as checkpoint
 from einops import rearrange, repeat
 from timm.models.layers import DropPath, trunc_normal_
 from fvcore.nn import FlopCountAnalysis, flop_count_str, flop_count, parameter_count
-from changedetection.checkpoints import format_checkpoint_load_report, load_model_weights
+from changedetection.checkpoints import (
+    format_checkpoint_load_report,
+    load_encoder_pretrained_weights,
+    load_model_weights,
+)
 DropPath.__repr__ = lambda self: f"timm.DropPath({self.drop_prob})"
 
 # triton cross scan, 2x speed than pytorch implementation =========================
@@ -1694,7 +1698,7 @@ class Backbone_VSSM(VSSM):
             return
         
         try:
-            load_info = load_model_weights(self, ckpt)
+            load_info = load_encoder_pretrained_weights(self, ckpt)
             print(format_checkpoint_load_report(load_info, title="PRETRAIN Load"))
         except Exception as e:
             print(f"Failed loading checkpoint form {ckpt}: {e}")

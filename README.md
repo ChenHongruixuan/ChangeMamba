@@ -215,7 +215,7 @@ python script/train_MambaBCD.py  --dataset 'SYSU' \
                                  --test_dataset_path '<dataset_path>/SYSU/test' \
                                  --test_data_list_path '<dataset_path>/SYSU/test_set.txt' \
                                  --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_small_224.yaml' \
-                                 --pretrained_weight_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
+                                 --encoder_pretrained_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
 ```
 
 ***Semantic change detection***
@@ -233,7 +233,7 @@ python script/train_MambaSCD.py  --dataset 'SECOND' \
                                  --test_dataset_path '<dataset_path>/SECOND/test' \
                                  --test_data_list_path '<dataset_path>/SECOND/test_set.txt' \
                                  --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_small_224.yaml' \
-                                 --pretrained_weight_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
+                                 --encoder_pretrained_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
 ```
 
 ***Building Damage Assessment***
@@ -251,7 +251,7 @@ python script/train_MambaBDA.py  --dataset 'xBD' \
                                  --test_dataset_path '<dataset_path>/xBD/test' \
                                  --test_data_list_path '<dataset_path>/xBD/test_set.txt' \
                                  --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_small_224.yaml' \
-                                 --pretrained_weight_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
+                                 --encoder_pretrained_path '<project_path>/ChangeMamba/pretrained_weight/vssm_small_0229_ckpt_epoch_222.pth'
 ```
 ### `E. Inference Using Our/Your Weights`
 
@@ -265,7 +265,11 @@ cd <project_path>/ChangeMamba/changedetection
 
 The following commands show how to infer binary change maps using trained MambaBCD-Tiny on the LEVIR-CD+ dataset:
 
-* **` Kind reminder`**: Please use [--resume] to load our trained model, instead of using [--pretrained_weight_path]. 
+* **`Parameter guide`**:
+  * `--encoder_pretrained_path`: encoder/backbone pretrained weights only.
+  * `--model_checkpoint_path`: full ChangeMamba model weights for inference or weight-only initialization.
+  * `--resume_training_path`: training resume checkpoint with optimizer/scheduler/iteration state.
+* **`Historical Zenodo checkpoints`**: some published task checkpoints contain model weights only. They still work with `--model_checkpoint_path`, but they should not be treated as full training resumes.
 
 ```bash
 python script/infer_MambaBCD.py  --dataset 'LEVIR-CD+' \
@@ -273,7 +277,7 @@ python script/infer_MambaBCD.py  --dataset 'LEVIR-CD+' \
                                  --test_dataset_path '<dataset_path>/LEVIR-CD+/test' \
                                  --test_data_list_path '<dataset_path>/LEVIR-CD+/test_set.txt' \
                                  --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_tiny_224_0229flex.yaml' \
-                                 --resume '<saved_model_path>/MambaBCD_Tiny_LEVIRCD+_F1_0.8803.pth'
+                                 --model_checkpoint_path '<saved_model_path>/MambaBCD_Tiny_LEVIRCD+_F1_0.8803.pth'
 ```
 
 ***Semantic change detection***
@@ -285,7 +289,7 @@ python script/infer_MambaSCD.py  --dataset 'SECOND'  \
                                  --test_dataset_path '<dataset_path>/SECOND/test' \
                                  --test_data_list_path '<dataset_path>/SECOND/test_set.txt' \
                                  --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_tiny_224_0229flex.yaml' \
-                                 --resume '<saved_model_path>/[your_trained_model].pth'
+                                 --model_checkpoint_path '<saved_model_path>/[your_trained_model].pth'
 ```
 
 ***Building damage assessment***
@@ -297,7 +301,7 @@ python script/infer_MambaBDA.py  --dataset 'xBD'  \
                                  --test_dataset_path '<dataset_path>/xBD/test' \
                                  --test_data_list_path '<dataset_path>/xBD/test_set.txt' \
                                  --cfg '<project_path>/ChangeMamba/changedetection/configs/vssm1/vssm_tiny_224_0229flex.yaml' \
-                                 --resume '<saved_model_path>/[your_trained_model].pth'
+                                 --model_checkpoint_path '<saved_model_path>/[your_trained_model].pth'
 ```
 
 
@@ -356,7 +360,7 @@ Based on peers' questions from issue, here's a quick navigate list of solutions 
 | Modify the model structure | Please refer to Issue [#44](https://github.com/ChenHongruixuan/ChangeMamba/issues/44) |
 | NameError: name 'selective_scan_cuda_oflex' is not defined | Please refer to Issue [#9](https://github.com/ChenHongruixuan/ChangeMamba/issues/9) |
 | Question about the relationship between iteration, epoch & batch size | Please refer to Issue [#32](https://github.com/ChenHongruixuan/ChangeMamba/issues/32) / [#48](https://github.com/ChenHongruixuan/ChangeMamba/issues/48) |
-| Inference using trained models has low accuracy | Please use `--resume` instead of `--pretrained_weight_path` to load the trained model's weight |
+| Inference using trained models has low accuracy | Please use `--model_checkpoint_path` instead of `--encoder_pretrained_path` to load the trained model's weight |
 
 
 ## 📜Reference

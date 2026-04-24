@@ -18,7 +18,7 @@ class BCDTrainer(BaseTrainer):
 
     def build_model(self, config):
         return ChangeMambaBCD(
-            pretrained=self.args.pretrained_weight_path,
+            pretrained=self.args.encoder_pretrained_path,
             **get_vssm_kwargs(config),
         )
 
@@ -110,7 +110,7 @@ class BCDInferer(BaseInferer):
 
     def build_model(self, config):
         return ChangeMambaBCD(
-            pretrained=self.args.pretrained_weight_path,
+            pretrained=self.args.encoder_pretrained_path,
             **get_vssm_kwargs(config),
         )
 

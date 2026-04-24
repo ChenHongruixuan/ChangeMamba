@@ -24,7 +24,7 @@ ${PYTHON_BIN} ${PROJECT_ROOT}/changedetection/script/train_MambaBCD.py \
     --train_data_list_path ${LIST_ROOT}/train_set.txt \
     --test_dataset_path ${DATA_ROOT}/test \
     --test_data_list_path ${LIST_ROOT}/test_set.txt \
-    --pretrained_weight_path ${PROJECT_ROOT}/pretrained_weight/vssm_tiny_0230_ckpt_epoch_262.pth \
+    --encoder_pretrained_path ${PROJECT_ROOT}/pretrained_weight/vssm_tiny_0230_ckpt_epoch_262.pth \
     --batch_size 16 \
     --crop_size 256 \
     --learning_rate 1e-4 \

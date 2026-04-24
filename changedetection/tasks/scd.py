@@ -22,7 +22,7 @@ class SCDTrainer(BaseTrainer):
         return ChangeMambaSCD(
             output_cd=2,
             output_clf=7,
-            pretrained=self.args.pretrained_weight_path,
+            pretrained=self.args.encoder_pretrained_path,
             **get_vssm_kwargs(config),
         )
 
@@ -158,7 +158,7 @@ class SCDInferer(BaseInferer):
         return ChangeMambaSCD(
             output_cd=2,
             output_clf=7,
-            pretrained=self.args.pretrained_weight_path,
+            pretrained=self.args.encoder_pretrained_path,
             **get_vssm_kwargs(config),
         )
 

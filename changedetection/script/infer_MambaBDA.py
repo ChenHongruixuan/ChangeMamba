@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 
 import argparse
 
-from changedetection.script.script_utils import populate_name_lists
+from changedetection.script.script_utils import add_weight_loading_args, normalize_weight_loading_args, populate_name_lists
 from changedetection.tasks import get_inferer
 
 
@@ -13,7 +13,7 @@ def main():
     parser = argparse.ArgumentParser(description="Inference on xBD dataset")
     parser.add_argument("--cfg", type=str, default=None)
     parser.add_argument("--opts", help="Modify config options by adding 'KEY VALUE' pairs.", default=None, nargs="+")
-    parser.add_argument("--pretrained_weight_path", type=str)
+    add_weight_loading_args(parser, allow_model_checkpoint=True)
     parser.add_argument("--dataset", type=str, default="xBD")
     parser.add_argument("--test_dataset_path", type=str)
     parser.add_argument("--test_data_list_path", type=str)
@@ -22,9 +22,9 @@ def main():
     parser.add_argument("--cuda", type=bool, default=True)
     parser.add_argument("--model_type", type=str, default="MambaBDA_Tiny")
     parser.add_argument("--result_saved_path", type=str, default="../results")
-    parser.add_argument("--resume", type=str)
 
     args = parser.parse_args()
+    normalize_weight_loading_args(args, parser, mode="infer")
     populate_name_lists(args, {"test_data_list_path": "test_data_name_list"})
     get_inferer("bda")(args).infer()
 

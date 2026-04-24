@@ -26,7 +26,7 @@ ${PYTHON_BIN} ${PROJECT_ROOT}/changedetection/script/train_MambaBDA_bright.py \
     --val_data_list_path ${LIST_ROOT}/val_set.txt \
     --test_dataset_path ${DATA_ROOT} \
     --test_data_list_path ${LIST_ROOT}/test_set.txt \
-    --pretrained_weight_path ${PROJECT_ROOT}/pretrained_weight/vssm_tiny_0230_ckpt_epoch_262.pth \
+    --encoder_pretrained_path ${PROJECT_ROOT}/pretrained_weight/vssm_tiny_0230_ckpt_epoch_262.pth \
     --train_batch_size 8 \
     --num_workers 8 \
     --crop_size 512 \

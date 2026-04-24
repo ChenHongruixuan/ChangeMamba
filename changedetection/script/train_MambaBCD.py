@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 
 import argparse
 
-from changedetection.script.script_utils import populate_name_lists
+from changedetection.script.script_utils import add_weight_loading_args, normalize_weight_loading_args, populate_name_lists
 from changedetection.tasks import get_trainer
 
 
@@ -13,7 +13,7 @@ def main():
     parser = argparse.ArgumentParser(description="Training on SYSU/LEVIR-CD+/WHU-CD dataset")
     parser.add_argument("--cfg", type=str, default=None)
     parser.add_argument("--opts", help="Modify config options by adding 'KEY VALUE' pairs.", default=None, nargs="+")
-    parser.add_argument("--pretrained_weight_path", type=str)
+    add_weight_loading_args(parser, allow_model_checkpoint=True, allow_resume_training=True)
     parser.add_argument("--dataset", type=str, default="SYSU")
     parser.add_argument("--type", type=str, default="train")
     parser.add_argument("--train_dataset_path", type=str)
@@ -30,12 +30,12 @@ def main():
     parser.add_argument("--max_iters", type=int, default=20000)
     parser.add_argument("--model_type", type=str, default="ChangeMamba-BCD")
     parser.add_argument("--model_param_path", type=str, default="../saved_models")
-    parser.add_argument("--resume", type=str)
     parser.add_argument("--learning_rate", type=float, default=1e-4)
     parser.add_argument("--momentum", type=float, default=0.9)
     parser.add_argument("--weight_decay", type=float, default=5e-3)
 
     args = parser.parse_args()
+    normalize_weight_loading_args(args, parser, mode="train")
     populate_name_lists(
         args,
         {
